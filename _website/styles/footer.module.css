@@ -1,0 +1,20 @@
+.footer {
+    margin-top: 2rem;
+    border-top: rem(1px) solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
+}
+
+.inner {
+    padding: var(--mantine-spacing-md);
+    @media (max-width: $mantine-breakpoint-sm) {
+        padding: var(--mantine-spacing-sm);
+    }
+    @media (max-width: $mantine-breakpoint-xs) {
+        padding: var(--mantine-spacing-xs);
+    }
+}
+
+.links {
+    @media (max-width: $mantine-breakpoint-xs) {
+        margin-top: var(--mantine-spacing-md);
+    }
+}

@@ -1,0 +1,66 @@
+{
+	"name": "ftc-lawyer",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+		"@gsap/react": "^2.1.1",
+		"@huggingface/inference": "^2.7.0",
+		"@langchain/community": "^0.2.18",
+		"@langchain/core": "^0.2.15",
+		"@langchain/groq": "^0.0.13",
+		"@mantine/charts": "^7.11.0",
+		"@mantine/code-highlight": "^7.11.1",
+		"@mantine/core": "^7.11.0",
+		"@mantine/form": "^7.11.0",
+		"@mantine/hooks": "^7.11.0",
+		"@splinetool/react-spline": "^4.0.0",
+		"@splinetool/runtime": "^1.9.0",
+		"@tabler/icons-react": "^3.6.0",
+		"@testing-library/jest-dom": "^5.16.5",
+		"@testing-library/react": "^13.4.0",
+		"@testing-library/user-event": "^13.5.0",
+		"aos": "^2.3.4",
+		"axios": "^1.7.2",
+		"cors": "^2.8.5",
+		"dotenv": "^16.4.5",
+		"eslint": "^8.57.0",
+		"eslint-config-next": "^14.2.4",
+		"gsap": "^3.12.5",
+		"langchain": "^0.2.9",
+		"next": "^14.2.4",
+		"nodemon": "^2.0.22",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"sweetalert2": "^11.12.2",
+		"web-vitals": "^2.1.4"
+	},
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"eslintConfig": {
+		"extends": [
+			"react-app",
+			"react-app/jest"
+		]
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"devDependencies": {
+		"postcss": "^8.4.38",
+		"postcss-preset-mantine": "^1.15.0",
+		"postcss-simple-vars": "^7.0.1"
+	}
+}

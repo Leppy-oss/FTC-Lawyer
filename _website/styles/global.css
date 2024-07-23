@@ -1,0 +1,14 @@
+body {
+    overflow-x: hidden;
+    font-family: 'Roboto', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.img-flip-x {
+    transform: rotateY(180deg);
+}
+
+.img-flip-y {
+    transform: rotateX(180deg);
+}
