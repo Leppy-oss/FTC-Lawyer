@@ -1,3 +1,5 @@
+import { PineconeStore, PineconeTranslator } from '@langchain/pinecone';
+
 const teams = {};
 
 const storageContains = (season, eventCode) => Object.hasOwn(teams, season) && Object.hasOwn(teams[season], eventCode);
