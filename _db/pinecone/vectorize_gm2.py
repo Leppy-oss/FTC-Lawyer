@@ -12,7 +12,7 @@ def vectorize_gm2(season):
         api_key=os.environ['HF_API_KEY'], model_name='BAAI/bge-small-en-v1.5'
     )
 
-    docs = PyMuPDFLoader('./res/gm2.pdf').load_and_split()
+    docs = PyMuPDFLoader('../res/gm2.pdf').load_and_split()
     print('Loaded PDFS')
 
     print('Vectorizing gm2')

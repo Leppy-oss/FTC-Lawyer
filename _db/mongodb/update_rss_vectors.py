@@ -6,19 +6,20 @@ from pinecone import Pinecone
 from vectorize_rss import vectorize_rss
 from datetime import datetime
 
+from pymongo import DESCENDING
+from init_mongo import init_collection
+
 load_dotenv()
 strptime_string = '%Y-%m-%d %H:%M:%S'
 
 def update_rss_vectors(season):
     rss = []
-    print('Initializing Pinecone index')
-    index = Pinecone().Index(os.environ['RSS_INDEX_BASE'] + str(season))
+    rss_stored = init_collection(os.environ['RSS_DB'], str(season))
+    most_recent_rss_date = datetime.strptime(rss_stored.find().sort('date', DESCENDING)[0]['date'], strptime_string)
+    print(f'Most recent RSS date in MongoDB Atlas: {most_recent_rss_date}')
+
     rss_remote = retrieve_rss()
-    rss_stored = retrieve_pinecone_rss(index)
-    most_recent_rss_date = datetime.strptime((max(rss_stored, key= lambda x:x['date']))['date'], strptime_string)
-    sorted_rss_dates = [i['date'] for i in sorted(rss_stored, key= lambda x:x['date'])]
     
-    print(f'Most recent RSS date in Pinecone: {most_recent_rss_date}')
     for entry in rss_remote:
         date = datetime.strptime(entry['date'], strptime_string)
         if date > most_recent_rss_date:
@@ -27,8 +28,8 @@ def update_rss_vectors(season):
         else:
             print(f'Completed remote RSS retrieval')
             break
-
-    print(len(sorted_rss_dates))
+        
+    vectorize_rss(season, rss, rss_stored)
 
 if __name__ == '__main__':
     update_rss_vectors(2023)
