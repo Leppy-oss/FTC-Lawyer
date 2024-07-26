@@ -5,11 +5,11 @@ import {
 	RunnableSequence,
 } from '@langchain/core/runnables';
 import { StringOutputParser } from '@langchain/core/output_parsers';
-import { getVectorStore } from './conn';
+import { getRetriever } from './conn';
 
 const llm = new ChatGroq({
 	apiKey: process.env.GROQ_API_KEY,
-	model: 'llama3-70b-8192',
+	model: 'llama3-8b-8192',
 	temperature: 0
 });
 
@@ -30,9 +30,9 @@ export async function POST(req) {
 		llm.temperature = temperature ?? 0;
 
 		try {
-			const retriever = getVectorStore().asRetriever();
+			const retriever = getRetriever();
 			const prompt = await pull('rlm/rag-prompt');
-			// prompt.promptMessages[0].prompt.template = process.env.PROMPT_TEMPLATE_STRING;
+			prompt.promptMessages[0].prompt.template = process.env.PROMPT_TEMPLATE_STRING;
 
 			const chain = RunnableSequence.from([{
 				context: retriever.pipe(formatDocumentsAsString),

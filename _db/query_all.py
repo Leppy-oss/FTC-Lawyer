@@ -37,4 +37,4 @@ def query(inp):
     return chain.invoke(inp)
     
 if __name__ == '__main__':
-    print(query('Is it allowed to use a USB battery to power the hubs'))
+    print(query('If I am 54 seconds into the TeleOP mode, how many more seconds until endgame?'))
