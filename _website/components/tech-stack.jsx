@@ -17,7 +17,7 @@ export default function TechStack() {
     ];
     const imgs = [
         {
-            src: '/qdrant-logo.png',
+            src: '/mongodb-logo.png',
             label: 'Qdrant Vector Storage'
         },
         {
