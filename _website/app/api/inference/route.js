@@ -1,4 +1,5 @@
 import { ChatGroq } from '@langchain/groq';
+import { MessagesPlaceholder, ChatPromptTemplate } from '@langchain/core/prompts';
 import { pull } from 'langchain/hub';
 import {
 	RunnablePassthrough,
@@ -6,6 +7,12 @@ import {
 } from '@langchain/core/runnables';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { getRetriever } from './conn';
+import { formatDocumentsAsString } from 'langchain/util/document';
+import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
+import { ConversationChain, LLMChain } from 'langchain/chains';
+import { createRetrievalChain } from 'langchain/chains/retrieval';
+import { AIMessage, HumanMessage } from '@langchain/core/messages';
+import { RunnableWithMessageHistory } from '@langchain/core/runnables';
 
 const llm = new ChatGroq({
 	apiKey: process.env.GROQ_API_KEY,
@@ -15,11 +22,9 @@ const llm = new ChatGroq({
 
 export const dynamic = 'force-dynamic';
 
-const formatDocumentsAsString = docs => docs.map((doc) => doc.pageContent).join('\n\n')
-
 export async function POST(req) {
 	if (req.method == 'POST') {
-		const { query, temperature } = await req.json();
+		const { query, temperature, chat_history: raw_chat_history=[] } = await req.json();
 		if (!query) return new Response(
 			JSON.stringify({ error: 'Invalid input format' }), {
 			status: 400,
@@ -27,26 +32,35 @@ export async function POST(req) {
 				'Content-Type': 'application/json'
 			}
 		});
-		llm.temperature = temperature ?? 0;
+		let human = false;
+		const chat_history = raw_chat_history.map(msg => {
+			human = !human;
+			return new (human ? HumanMessage : AIMessage)(msg);
+		});
 
 		try {
+			llm.temperature = temperature ?? 0;
+
 			const retriever = getRetriever();
-			const prompt = await pull('rlm/rag-prompt');
-			prompt.promptMessages[0].prompt.template = process.env.PROMPT_TEMPLATE_STRING;
+			const prompt = ChatPromptTemplate.fromMessages([
+				['system', process.env.PROMPT_TEMPLATE_STRING],
+				new MessagesPlaceholder('chat_history'),
+				['human', '{query}'],
+			]);
 
 			const chain = RunnableSequence.from([{
-				context: retriever.pipe(formatDocumentsAsString),
-				question: new RunnablePassthrough(),
-			},
-				prompt,
-				llm,
-			new StringOutputParser(),
-			]);
+				context: RunnableSequence.from([
+					input => input.query,
+					retriever.pipe(formatDocumentsAsString),
+				]),
+				query: input => input.query,
+				chat_history: input => input.chat_history
+			}, prompt, llm, new StringOutputParser()]);
 
 			const responseStream = new TransformStream();
 			const streamWriter = responseStream.writable.getWriter();
 			const encoder = new TextEncoder();
-			const stream = await chain.stream(query);
+			const stream = await chain.stream({ query, chat_history });
 			const streamText = async () => {
 				try {
 					for await (const chunk of stream) {
@@ -83,6 +97,4 @@ export async function POST(req) {
 	});
 }
 
-export const config = {
-	runtime: 'nodejs'
-};
+export const runtime = 'nodejs';
