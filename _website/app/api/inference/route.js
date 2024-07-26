@@ -9,14 +9,14 @@ import { StringOutputParser } from '@langchain/core/output_parsers';
 import { getRetriever } from './conn';
 import { formatDocumentsAsString } from 'langchain/util/document';
 import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
-import { ConversationChain, LLMChain } from 'langchain/chains';
+import { create } from 'langchain/chains';
 import { createRetrievalChain } from 'langchain/chains/retrieval';
 import { AIMessage, HumanMessage } from '@langchain/core/messages';
 import { RunnableWithMessageHistory } from '@langchain/core/runnables';
 
 const llm = new ChatGroq({
 	apiKey: process.env.GROQ_API_KEY,
-	model: 'llama3-8b-8192',
+	model: 'llama3-70b-8192',
 	temperature: 0
 });
 
@@ -24,7 +24,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
 	if (req.method == 'POST') {
-		const { query, temperature, chat_history: raw_chat_history=[] } = await req.json();
+		const { query, temperature, chat_history: raw_chat_history = [] } = await req.json();
 		if (!query) return new Response(
 			JSON.stringify({ error: 'Invalid input format' }), {
 			status: 400,
@@ -41,6 +41,14 @@ export async function POST(req) {
 		try {
 			llm.temperature = temperature ?? 0;
 
+			const contPrompt = ChatPromptTemplate.fromMessages([
+				['system', process.env.CONT_PROMPT],
+				new MessagesPlaceholder('chat_history'),
+				['human', '{query}'],
+			]);
+
+			const contextualizedQuestion = input => 'chat_history' in input? contPrompt.pipe(llm).pipe(new StringOutputParser()) : input.query;
+
 			const retriever = getRetriever();
 			const prompt = ChatPromptTemplate.fromMessages([
 				['system', process.env.PROMPT_TEMPLATE_STRING],
@@ -49,10 +57,7 @@ export async function POST(req) {
 			]);
 
 			const chain = RunnableSequence.from([{
-				context: RunnableSequence.from([
-					input => input.query,
-					retriever.pipe(formatDocumentsAsString),
-				]),
+				context: async input => 'chat_history' in input? contextualizedQuestion(input).pipe(retriever).pipe(formatDocumentsAsString) : '',
 				query: input => input.query,
 				chat_history: input => input.chat_history
 			}, prompt, llm, new StringOutputParser()]);

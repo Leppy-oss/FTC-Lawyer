@@ -7,15 +7,8 @@ import { useMobile } from '../lib/hooks';
 
 export default function Tryout() {
     // Inference API parameters
-    const [season, setSeason] = useState(null);
-    const [eventCode, setEventCode] = useState('');
-    const [teams, setTeams] = useState([]);
     const [query, setQuery] = useState('');
-
-    // Form population
-    const seasonList = Array.from({ length: 5 }, (x, i) => `${i + 2019} - ${i + 2020}`);
-    const [eventList, setEventList] = useState([]);
-    const [teamList, setTeamList] = useState([]);
+    const [chatHistory, setChatHistory] = useState([]);
 
     const [submitted, setSubmitted] = useState(false);
     const [recv, setRecv] = useState(false);
@@ -24,33 +17,6 @@ export default function Tryout() {
     const [output, setOutput] = useState('');
 
     const mobile = useMobile();
-
-    useEffect(() => {
-        if (season) {
-            setEventCode('');
-            setEventList(['Loading...']);
-            const fetchEvents = async () => {
-                const response = (await fetchWithHandling('/api/events/?' + new URLSearchParams({ season: season.slice(0, 4) }))).response;
-                setEventList(response.data.eventsSearch.map(event => `${event.name} (${event.code})`));
-                setEventCode(null);
-            }
-            fetchEvents();
-        }
-    }, [season]);
-
-    useEffect(() => {
-        if (season && eventCode && eventCode != 'Loading...') {
-            setTeams([]);
-            setTeamList(['Loading...']);
-            const fetchTeams = async () => {
-                console.log('loading...')
-                const response = (await fetchWithHandling('/api/teams/?' + new URLSearchParams({ season: season.slice(0, 4), eventCode: eventCode.split('(').at(-1).split(')').at(0) }))).response;
-                setTeamList(response);
-                setTeams([]);
-            }
-            fetchTeams();
-        }
-    }, [season, eventCode]);
 
     return (
         <Container fluid mt='xl'>
@@ -68,7 +34,7 @@ export default function Tryout() {
                     e.preventDefault();
                     setSubmitted(true);
                     setRecv(false);
-                    const response = await postWithHandling('/api/inference/', { season: season.slice(0, 4), eventCode: eventCode.split('(').at(-1).split(')').at(0), teams, query }, {
+                    const response = await postWithHandling('/api/inference/', { query, chat_history: chatHistory }, {
                         responseType: 'stream',
                         adapter: 'fetch'
                     });
@@ -82,52 +48,15 @@ export default function Tryout() {
                             tempOutput += value;
                             setOutput(tempOutput);
                         }
+                        setChatHistory([...chatHistory, query, tempOutput]);
                         setSubmitted(false);
                     }
                 }}>
                     <Stack w='fit-content' align='stretch' justify='center'>
-                        <Group justify='space-between'>
-                            <Select
-                                searchable
-                                label='Season'
-                                placeholder='Select season'
-                                value={season}
-                                data={seasonList}
-                                disabled={submitted}
-                                required
-                                onChange={setSeason} />
-
-                            <Box pos='relative'>
-                                <LoadingOverlay loaderProps={{ size: 'xs' }} visible={eventList.length > 0 && eventList.at(0) == 'Loading...'} />
-                                <Select
-                                    searchable
-                                    disabled={!eventList.length || submitted}
-                                    label='Event Code'
-                                    placeholder='Select event'
-                                    value={eventCode}
-                                    data={eventList}
-                                    required
-                                    onChange={setEventCode} />
-                            </Box>
-                        </Group>
-
-                        <Box pos='relative'>
-                            <LoadingOverlay loaderProps={{ size: 'xs' }} visible={teamList.length > 0 && teamList.at(0) == 'Loading...'} />
-                            <MultiSelect
-                                searchable
-                                disabled={!teamList.length || submitted}
-                                label='Teams to Query'
-                                placeholder='Select team # after inputting season & event code'
-                                value={teams}
-                                data={teamList}
-                                required
-                                onChange={e => setTeams(e)} />
-                        </Box>
-
                         <Search
                             label='Query'
                             required
-                            disabled={!(eventList.length && teams.length) || submitted}
+                            disabled={submitted}
                             id='change-query'
                             onChange={e => setQuery(e.target.value)}
                             placeholder='Ask me anything...' />

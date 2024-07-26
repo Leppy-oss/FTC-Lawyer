@@ -19,7 +19,7 @@ def vectorize_rss(rss=None, collection=None, embeddings=None):
         print('No RSS dicts passed, defaulting to retrieved RSS')
         rss = retrieve_rss()
         
-    docs = [Document(page_content=f'QUESTION: {r['question']}\n ANSWER: {r['answer']}', metadata={'date': r['date'], 'source-type': 'rss'}) for r in rss]
+    docs = [Document(page_content=f'QNA QUESTION (FROM RSS FEED): {r['question']}\n QNA ANSWER (FROM RSS FEED): {r['answer']}', metadata={'date': r['date'], 'source-type': 'rss'}) for r in rss]
 
     print('Vectorizing RSS feed')
     MongoDBAtlasVectorSearch.from_documents(
