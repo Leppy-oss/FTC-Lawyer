@@ -18,11 +18,11 @@ export default function TechStack() {
     const imgs = [
         {
             src: '/mongodb-logo.png',
-            label: 'Qdrant Vector Storage'
+            label: 'MongoDB Atlas Vector Search'
         },
         {
             src: '/lc-logo.png',
-            label: 'Langchain.js'
+            label: 'LangChain.js'
         },
         {
             src: '/fs-logo.svg',

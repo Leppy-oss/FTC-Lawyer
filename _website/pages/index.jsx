@@ -13,7 +13,7 @@ export default function Home() {
     const mobile = useMobile();
 
     const DummySwitch = ({ Icon, children }) => (
-        <Group mb='sm' style={{ zoom: mobile ? 0.7 : 1.5 }} ml='xl' mt={mobile && 'xl'}>
+        <Group mb='sm' style={{ zoom: mobile ? 0.65 : 1.25 }} ml='xl' mt={mobile && 'xl'}>
             <Switch checked={true} readOnly size='xl' thumbIcon={
                 <Icon style={{ width: '24', height: '24' }}
                     color={theme.colors.blue[6]}
@@ -24,7 +24,7 @@ export default function Home() {
     );
 
     const DummyCheckbox = ({ children }) => (
-        <Group mb='sm' style={{ zoom: mobile ? 0.75 : 1.5 }} ml='xl' mt={mobile && 'xl'}>
+        <Group mb='sm' style={{ zoom: mobile ? 0.75 : 1.2 }} ml='xl' mt={mobile && 'xl'}>
             <Checkbox checked={true} readOnly size='xl' />
             <Text size='xl' fw={500}>{children}</Text>
         </Group>
@@ -44,11 +44,11 @@ export default function Home() {
             }} lightHidden />
             <Container mx='xl' p={0} fluid>
                 <Hero />
-                <Section text='What is AI-Scout?' my='xl' description={
+                <Section text='What is FTC Lawyer?' my='xl' description={
                     <>
-                        AI-Scout is the world's <Text span fw={700} c='blue'>first </Text>
-                        FIRST Tech Challenge (FTC) scouting system that fully utilizes the power of
-                        <Text span fw={700} c='blue'> generative AI.</Text>
+                        FTC Lawyer is the world's <Text span fw={700} c='blue'>first </Text>
+                        FIRST Tech Challenge (FTC) lawyer system that <Text span fw={700} c='blue'>fully </Text> utilizes the power of
+                        <Text span fw={700} c='blue'> generative AI.</Text> It retrieves information from the Game Manuals and <Text span fw={700} c='blue'>live</Text> FTC Q&A feed.
                     </>
                 } additionalContent={
                     <Link href='/chat'><Button mt='xl' size='xl' rightSection={<IconArrowNarrowRight />} variant='gradient' gradient={{ from: 'pink', to: 'orange' }}>
@@ -57,32 +57,32 @@ export default function Home() {
                 }>
                     <ScrollHero />
                 </Section>
-                <Section text='Revolutionizing the World of Scouting' description={
+                <Section text='Revolutionizing the Rulebook' description={
                     <>
-                        With the power of generative AI, AI-Scout makes
+                        With the power of generative AI, FTC Lawyer makes
                         <Text span fw={700} c='blue'> anything possible.</Text>
                     </>
                 }>
-                    <DummySwitch Icon={IconSpeedboat}>Scouting Speed</DummySwitch>
-                    <DummySwitch Icon={IconChairDirector}>Scouting Ease</DummySwitch>
-                    <DummySwitch Icon={IconBrandOpenai}>Scouting Intelligence</DummySwitch>
+                    <DummySwitch Icon={IconSpeedboat}>Lawyer Speed</DummySwitch>
+                    <DummySwitch Icon={IconChairDirector}>Lawyer Ease</DummySwitch>
+                    <DummySwitch Icon={IconBrandOpenai}>Lawyer Intelligence</DummySwitch>
                 </Section>
                 <Section text='Blazing Fast Descriptions' reversed description={
                     <>
-                        {"Groq's LPU (Language-Processing Unit) AI inference engine streams 15x faster than competitors, achieving up to "}
+                        Groq's LPU (Language-Processing Unit) AI inference engine streams <Text span fw={700} c='blue'>15x</Text> faster than competitors, achieving up to
                         <Text span fw={700} c='blue'>330 tokens/s.</Text>
                     </>
                 } src='/groq.webp' />
                 <Section text='Incredible Versatility' description={
                     <>
-                        {"Groq's LPU (Language-Processing Unit) AI inference engine streams 15x faster than competitors, achieving up to "}
-                        <Text span fw={700} c='blue'>330 tokens/s.</Text>
+                        With <Text span fw={700} c='blue'>700+</Text> vectorized documents and live RSS updates,
+                        FTC Lawyer empowers its users with a <Text span fw={700} c='blue'>superhuman</Text> overview of the FTC rulebook.
                     </>
                 }>
-                    <DummyCheckbox>Team Comparison</DummyCheckbox>
-                    <DummyCheckbox>Match Summary</DummyCheckbox>
-                    <DummyCheckbox>In-Depth Analysis</DummyCheckbox>
-                    <DummyCheckbox>Score Reasoning</DummyCheckbox>
+                    <DummyCheckbox>Rapid Retrieval</DummyCheckbox>
+                    <DummyCheckbox>Complex Reasoning</DummyCheckbox>
+                    <DummyCheckbox>Chat History</DummyCheckbox>
+                    <DummyCheckbox>Gracious Professionalism</DummyCheckbox>
                 </Section>
                 <Divider my='xl' size='xl' mx='sm' />
             </Container>

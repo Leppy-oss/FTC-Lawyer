@@ -53,16 +53,6 @@ export function Header() {
         {
             name: 'About',
             href: '/about'
-        },
-        {
-            name: 'API',
-            href: '/api',
-            type: 'dropdown',
-            dropdownItems: [
-                { name: 'Overview', href: '/', description: 'This feature is still in progress!' },
-                { name: 'Playground', href: '/playground', description: 'This feature is still in progress!' },
-                { name: 'Docs', href: '/docs', description: 'This feature is still in progress!' }
-            ]
         }
     ];
 
