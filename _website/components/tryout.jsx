@@ -34,7 +34,7 @@ export default function Tryout() {
                     e.preventDefault();
                     setSubmitted(true);
                     setRecv(false);
-                    const response = await postWithHandling('/api/inference/', { query, chat_history: chatHistory }, {
+                    const response = await postWithHandling('/api/inference/fast/', { query, chat_history: chatHistory }, {
                         responseType: 'stream',
                         adapter: 'fetch'
                     });
