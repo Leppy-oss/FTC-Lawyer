@@ -1,10 +1,9 @@
 import { ChatGroq } from '@langchain/groq';
-import { MessagesPlaceholder, ChatPromptTemplate } from '@langchain/core/prompts';
-import { RunnableSequence } from '@langchain/core/runnables';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { RunnablePassthrough, RunnableSequence } from '@langchain/core/runnables';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { getRetriever } from '../conn';
 import { formatDocumentsAsString } from 'langchain/util/document';
-import { AIMessage, HumanMessage } from '@langchain/core/messages';
 
 const llm = new ChatGroq({
 	apiKey: process.env.GROQ_API_KEY,
@@ -16,18 +15,13 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
 	if (req.method == 'POST') {
-		const { query, temperature, chat_history: raw_chat_history = [] } = await req.json();
+		const { query, temperature } = await req.json();
 		if (!query) return new Response(
 			JSON.stringify({ error: 'Invalid input format' }), {
 			status: 400,
 			headers: {
 				'Content-Type': 'application/json'
 			}
-		});
-		let human = false;
-		const chat_history = raw_chat_history.map(msg => {
-			human = !human;
-			return new (human ? HumanMessage : AIMessage)(msg);
 		});
 
 		try {
@@ -36,30 +30,21 @@ export async function POST(req) {
 			const retriever = getRetriever();
 			const prompt = ChatPromptTemplate.fromMessages([
 				['system', process.env.PROMPT_TEMPLATE_STRING],
-				new MessagesPlaceholder('chat_history'),
-				['human', '{query}'],
+				['human', '{query}']
 			]);
 
 			const chain = RunnableSequence.from([{
-				context: async input => 'chat_history' in input? RunnableSequence.from([
-                    input => input.query,
-                    retriever.pipe(formatDocumentsAsString),
-                    ret => { console.log('Retrieved docs'); return ret; }
-                ]) : '',
-				query: input => input.query,
-				chat_history: input => [] //input.chat_history
+				context: retriever.pipe(formatDocumentsAsString),
+				query: new RunnablePassthrough()
 			}, prompt, llm, new StringOutputParser()]);
 
 			const responseStream = new TransformStream();
 			const streamWriter = responseStream.writable.getWriter();
 			const encoder = new TextEncoder();
 			const stream = await chain.stream({ query, chat_history });
-            console.log('Response arriving');
 			const streamText = async () => {
 				try {
-					for await (const chunk of stream) {
-						streamWriter.write(encoder.encode(chunk));
-					}
+					for await (const chunk of stream) streamWriter.write(encoder.encode(chunk));
 				} catch (e) { streamWriter.write(encoder.encode(`Error: ${e}`)) }
 				streamWriter.close();
 			}

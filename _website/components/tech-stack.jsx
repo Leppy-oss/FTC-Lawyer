@@ -31,10 +31,7 @@ export default function TechStack() {
     ];
 
     return (
-        <Container fluid p={0}>
-            <Center>
-                <Text ta='center' w='fit-content' fw={700} size={mobile ? '3rem' : '4rem'} mb='md' variant='gradient' gradient={{ from: 'blue', to: 'pink' }}>Tech Stack</Text>
-            </Center>
+        <Container mb='xl' fluid p={0}>
             <Container style={{ overflowX: 'hidden' }} fluid p={0} bg='gray'>
                 <Flex direction='row' wrap='nowrap' py='xs' className={classes.marquee} h='8rem'>
                     {icons.map(icon => <Center mx='xl' key={icon.label}>

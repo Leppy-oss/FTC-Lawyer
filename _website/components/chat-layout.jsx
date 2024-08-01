@@ -6,9 +6,10 @@ import { Header } from './header';
 import constants from '../lib/constants';
 import { useMobile } from '../lib/hooks';
 
-export default function Layout({ children }) {
+export default function ChatLayout({ children }) {
     const rawPathname = usePathname().slice(1).split('/').pop();
     const pathname = rawPathname.charAt(0).toUpperCase().concat(rawPathname.slice(1));
+    const mobile = useMobile();
 
     return (
         <div className='app'>
@@ -20,10 +21,14 @@ export default function Layout({ children }) {
             </Head>
             <main>
                 <noscript>You need to enable JavaScript to run this app.</noscript>
-                <Header />
-                <Box h='100%'>{children}</Box>
-                <Footer />
-            </main >
-        </div >
+                <div style={{ maxHeight: '100vh', overflowY: 'hidden' }}>
+                    <Header />
+                    <Box h={`calc(100vh - ${mobile ? '160px' : '150px'})`}>
+                        {children}
+                    </Box>
+                    <Footer />
+                </div>
+            </main>
+        </div>
     )
 }

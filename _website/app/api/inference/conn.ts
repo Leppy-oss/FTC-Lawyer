@@ -16,11 +16,10 @@ export const getRetriever = () => {
 		retriever = new EnsembleRetriever({
 			retrievers: ['GM1', 'GM2', 'RSS'].map(col => new MongoDBAtlasVectorSearch(
 				embeddings, {
-					collection: client.db(process.env.DB_NAME).collection(process.env[`${col}_COL`]!),
-					indexName: process.env[`${col}_COL`]! + process.env.ISCPT!
-				}
-			).asRetriever()),
-			weights: [0.4, 0.4, 0.2]
+				collection: client.db(process.env.DB_NAME).collection(process.env[`${col}_COL`]!),
+				indexName: process.env[`${col}_COL`]! + process.env.ISCPT!,
+			}).asRetriever({ k: 4 })),
+			weights: [0.4, 0.4, 0.2],
 		});
 	}
 	return retriever;

@@ -1,4 +1,4 @@
-import { Container, Group, ActionIcon, rem, Image, Text, useMantineColorScheme } from '@mantine/core';
+import { Container, Group, ActionIcon, rem, Image, Text } from '@mantine/core';
 import { IconBrandX, IconBrandYoutube, IconBrandInstagram } from '@tabler/icons-react';
 import classes from '../styles/footer.module.css';
 import { useMobile } from '../lib/hooks';
@@ -24,7 +24,7 @@ export default function Footer() {
                             <IconBrandInstagram style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
                         </ActionIcon>
                     </Group>
-                    <Text c="dimmed" size="sm">
+                    <Text c='dimmed' size='sm'>
                         © 2024 Leppy-oss. All rights reserved.
                     </Text>
                 </Group>

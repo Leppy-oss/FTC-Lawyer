@@ -9,27 +9,20 @@ import Aos from 'aos';
 import 'aos/dist/aos.css';
 import GsapProvider from '../components/gsap-provider';
 
-function MyApp({ Component, pageProps }) {
+export default function FTCLawyer({ Component, pageProps }) {
     useEffect(() => {
         Aos.init({
             duration: 1000,
             easing: 'ease-in-out-cubic'
         });
     }, []);
+    const getLayout = Component.getLayout ?? (page => <Layout>{page}</Layout>);
 
     return (
-        <MantineProvider withGlobalStyles withNormalizeCSS defaultColorScheme='dark' theme={createTheme({
-            breakpoints: {
-                xl: '140em'
-            }
-        })}>
+        <MantineProvider withGlobalStyles withNormalizeCSS defaultColorScheme='dark' theme={createTheme({ breakpoints: { xl: '140em' } })}>
             <GsapProvider>
-                <Layout>
-                    <Component {...pageProps} />
-                </Layout>
+                {getLayout(<Component {...pageProps} />)}
             </GsapProvider>
         </MantineProvider>
     );
 }
-
-export default MyApp;

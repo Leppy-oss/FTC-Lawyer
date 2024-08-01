@@ -1,20 +1,17 @@
-import { TextInput, ActionIcon, useMantineTheme, rem } from '@mantine/core';
-import { IconSearch, IconArrowRight } from '@tabler/icons-react';
+import { TextInput, ActionIcon, rem } from '@mantine/core';
+import { IconSearch, IconArrowUp } from '@tabler/icons-react';
 
-export default function Search(props) {
-    const theme = useMantineTheme();
-
+export default function HumanInput({ buttonDisabled, onSubmit, ...props }) {
     return (
         <TextInput
             autoComplete='off'
             radius='xl'
-            size='md'
-            placeholder={props.placeholder}
-            rightSectionWidth={42}
-            leftSection={<IconSearch style={{ width: rem(18), height: rem(18) }} stroke={1.5} />}
+            size='lg'
+            rightSectionWidth={48}
+            leftSection={<IconSearch style={{ width: rem(24), height: rem(24) }} stroke={2} />}
             rightSection={
-                <ActionIcon {...props} type='submit' size={32} radius='xl' color={theme.primaryColor} variant='filled'>
-                    <IconArrowRight style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+                <ActionIcon size={36} radius='xl' variant='light' disabled={buttonDisabled} onClick={onSubmit}>
+                    <IconArrowUp style={{ width: rem(24), height: rem(24) }} stroke={2} />
                 </ActionIcon>
             }
             {...props}

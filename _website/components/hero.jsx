@@ -1,6 +1,5 @@
 import { Text, Grid, Image } from '@mantine/core';
 import { useMobile, useWidescreen } from '../lib/hooks';
-import { useEffect } from 'react';
 
 export default function Hero() {
     const mobile = useMobile();
