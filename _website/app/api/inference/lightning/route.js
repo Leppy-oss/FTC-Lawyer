@@ -41,7 +41,7 @@ export async function POST(req) {
 			const responseStream = new TransformStream();
 			const streamWriter = responseStream.writable.getWriter();
 			const encoder = new TextEncoder();
-			const stream = await chain.stream({ query, chat_history });
+			const stream = await chain.stream(query);
 			const streamText = async () => {
 				try {
 					for await (const chunk of stream) streamWriter.write(encoder.encode(chunk));

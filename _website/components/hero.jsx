@@ -14,11 +14,11 @@ export default function Hero() {
                     </Text><br /><Text span fw={500} size={mobile ? '2rem' : '3.5rem'}>Powered Retrieval</Text>
                 </Text>
                 <Text size={mobile ? '2rem' : '3rem'}>
-                    Unlocking a new dimension to FTC rules.
+                    Unlocking a new dimension to the FTC rulebook.
                 </Text>
             </Grid.Col>
             <Grid.Col span={mobile ? 12 : 5} order={mobile ? 0 : 1} data-aos='fade' data-aos-anchor='#home-container'>
-                <Image className='img-flip-x' src='/mockup-phone.png' alt='phone mockup'></Image>
+                <Image className='img-flip-x' src='/mockup.png' alt='mockup'></Image>
             </Grid.Col>
         </Grid>
     );

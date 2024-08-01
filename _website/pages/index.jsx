@@ -1,5 +1,4 @@
 import { Button, Checkbox, Container, Divider, Group, Image, Switch, Text } from '@mantine/core';
-import Tryout from '../components/tryout';
 import Hero from '../components/hero';
 import ScrollHero from '../components/scroll-hero';
 import Section from '../components/section';
