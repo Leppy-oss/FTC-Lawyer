@@ -8,7 +8,7 @@ export default function Message({ human, children }) {
 
     if (human) return (
         <Container fluid p={0} w='100%' mt='md'>
-            <Paper className={classes.humanMessage} px={mobile ? 'md' : 'lg'} radius={mobile ? 'lg' : 'xl'} mr={mobile ? 'sm' : 'xl'} maw='40%' style={{ float: 'right' }} ta='left'>
+            <Paper className={classes.humanMessage} px={mobile ? 'md' : 'lg'} radius={mobile ? 'lg' : 'xl'} mr={mobile ? 'sm' : 'xl'} maw={mobile ? '80%' : '40%'} style={{ float: 'right' }} ta='left'>
                 <Text p={mobile ? 'xs' : 'sm'} size={mobile ? 'sm' : 'md'}>{children}</Text>
             </Paper>
         </Container>
