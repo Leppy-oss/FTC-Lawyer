@@ -1,15 +1,16 @@
 import { Center, Stack, Image, ScrollArea, Container, Paper, Group, Box, Text, LoadingOverlay, ActionIcon, rem, Drawer, Slider, SegmentedControl, Alert, Checkbox } from '@mantine/core';
 import HumanInput from '../components/human-input';
 import { postWithHandling } from '../lib/fetch-ex';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ChatLayout from '../components/chat-layout';
 import { useMobile } from '../lib/hooks';
 import classes from '../styles/chat.module.css';
-import { IconCircuitMotor, IconFlame, IconGauge, IconInfoCircle, IconSettings, IconUsb } from '@tabler/icons-react';
+import { IconBolt, IconCircuitMotor, IconFlame, IconGauge, IconInfoCircle, IconSettings, IconUsb } from '@tabler/icons-react';
 import { DEFAULT_THEME as theme } from '@mantine/core';
 import Message from '../components/message';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMounted } from '@mantine/hooks';
 import Swal from 'sweetalert2';
+import llama3Tokenizer from 'llama3-tokenizer-js';
 
 const Suggestion = ({ Icon, children, mobile, colors, shouldTransition, onClick }) => (
     <Paper className={`${classes.suggestion} ${!shouldTransition ? classes.noTransition : ''}`} radius='lg' p='md' withBorder w={mobile ? '50%' : '25%'} onClick={onClick}>
@@ -32,22 +33,36 @@ export default function Chat() {
     const [temperature, setTemperature] = useState(0);
     const [narrate, setNarrate] = useState(false);
     const [stream, setStream] = useState(true);
+    const [responseTime, setResponseTime] = useState(0);
+    const [streamTime, setStreamTime] = useState(0);
+    const [ready, setReady] = useState(false);
+    const [recv, setRecv] = useState(false);
+    const mounted = useMounted();
 
     const vp = useRef();
-
     const mobile = useMobile();
 
+    const scrollVp = () => vp.current.scrollTo({ top: vp.current.scrollHeight, behavior: 'smooth' });
+
     const queryLawyer = async toQuery => {
+        setRecv(false);
         setQuery('');
+        setResponseTime(0);
         setSubmitted(true);
         const initChatHistory = [...chatHistory];
         setChatHistory([...initChatHistory, toQuery]);
         setOutput('');
+        const startResponseTime = Date.now();
+        const timeout = setTimeout(() => { if (!recv) setResponseTime(Date.now() - startResponseTime); }, 6000);
         const response = await postWithHandling(`/api/inference/${mode.toLowerCase().includes('lightning') ? 'lightning/' : ''}`, { query: toQuery, chat_history: chatHistory, temperature }, {
             responseType: 'stream',
             adapter: 'fetch'
         });
-        setTimeout(500, () => vp.current.scrollTo({ top: vp.current.scrollHeight, behavior: 'smooth' }));
+        setRecv(true);
+        clearTimeout(timeout);
+        setTimeout(500, scrollVp);
+        const startTime = Date.now();
+        setResponseTime(startTime - startResponseTime);
         if (response) {
             const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
             let tempOutput = '';
@@ -57,11 +72,12 @@ export default function Chat() {
                 tempOutput += value;
                 if (stream) {
                     setOutput(tempOutput);
-                    vp.current.scrollTo({ top: vp.current.scrollHeight, behavior: 'smooth' })
+                    scrollVp();
                 }
             }
+            setStreamTime(Date.now() - startTime)
             if (!stream) setOutput(tempOutput);
-            vp.current.scrollTo({ top: vp.current.scrollHeight, behavior: 'smooth' })
+            scrollVp();
             if (narrate) {
                 const u = new SpeechSynthesisUtterance(tempOutput);
                 u.pitch = 2;
@@ -73,9 +89,15 @@ export default function Chat() {
         }
     };
 
+    useEffect(() => {
+        fetch('/api/inference/refresh/')
+            .finally(() => setReady(true));
+    }, []);
+
     return (
         <Stack w='100%' mt='md' h='100%'>
             <ScrollArea mah='100%' flex='1' viewportRef={vp}>
+                <LoadingOverlay visible={!ready} overlayProps={{ blur: '4px' }} loaderProps={{ color: 'white', type: 'dots' }} />
                 <Center w='100%' pos='absolute' h='100%' style={{ visibility: chatHistory.length ? 'hidden' : 'visible' }}>
                     <Container p={0} w={mobile ? '90%' : '70%'}>
                         <Image src='/chat-banner.png' alt='' opacity={0.5} lightHidden />
@@ -129,7 +151,10 @@ export default function Chat() {
                 <Stack>
                     {(() => {
                         let human = false;
-                        const chatHistoryMessages = chatHistory.map((msg, index) => { human = !human; return <Message key={index} human={human}>{msg}</Message>; });
+                        const chatHistoryMessages = chatHistory.map((msg, index) => {
+                            human = !human;
+                            return <Message key={index} human={human}>{msg}</Message>;
+                        });
                         if (chatHistoryMessages.length % 2) chatHistoryMessages.push(
                             <Message key={chatHistoryMessages.length} human={false}>{output ||
                                 <Box pos='relative' h='2rem' w='3rem'>
@@ -143,6 +168,27 @@ export default function Chat() {
                                 </Box>
                             }</Message>
                         );
+                        else if (chatHistoryMessages.length) {
+                            chatHistoryMessages.push(<Group mx={mobile ? '62px' : '84px'} px={mobile ? 'md' : 'lg'} key={1e9} gap='xs'>
+                                {!mobile && <>
+                                    <Text size={mobile ? 'sm' : 'md'} fs='italic'>Response: {parseInt(responseTime)} ms</Text>
+                                    <IconBolt style={{ transform: 'skewX(-12deg)' }} />
+                                    <Text size={mobile ? 'sm' : 'md'} fs='italic'>Inference: {parseInt(streamTime)} ms</Text>
+                                    <IconBolt style={{ transform: 'skewX(-12deg)' }} />
+                                </>}
+                                <Text size={mobile ? 'sm' : 'md'} fs='italic'>Tokens/s: {Math.round(llama3Tokenizer.encode(chatHistory[chatHistory.length - 1]).length / streamTime * 1e6) / 1e2}</Text>
+                                {mobile && <IconBolt style={{ transform: 'skewX(-12deg)' }} />}
+                            </Group>)
+                            if (mounted) scrollVp();
+                        }
+                        if (responseTime > 6000 && chatHistoryMessages.length) {
+                            chatHistoryMessages.push(
+                                <Alert key={2e9} variant='light' mx='xl' w={mobile ? '80%' : '50%'} color='blue' title='Notice' icon={<IconInfoCircle />}>
+                                    You seem to experiencing very high response times; this may be caused by a rate limit on our end. Try using Lightning⚡ Mode for now! (Click ⚙️ icon for settings.)
+                                </Alert>
+                            );
+                            if (mounted) scrollVp();
+                        }
                         return chatHistoryMessages;
                     })()}
                 </Stack>
@@ -165,8 +211,8 @@ export default function Chat() {
                                 </ActionIcon>
                             </>
                         }
-                        disabled={submitted}
-                        buttonDisabled={!query || submitted}
+                        disabled={submitted || !ready}
+                        buttonDisabled={!query || submitted || !ready}
                         onChange={e => setQuery(e.target.value)}
                         w={mobile ? '90%' : '70%'}
                         placeholder='Message FTC Lawyer' />

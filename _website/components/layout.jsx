@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation';
 import Footer from './footer';
 import { Header } from './header';
 import constants from '../lib/constants';
-import { useMobile } from '../lib/hooks';
 
 export default function Layout({ children }) {
     const rawPathname = usePathname().slice(1).split('/').pop();

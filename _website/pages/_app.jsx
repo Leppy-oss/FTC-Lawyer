@@ -7,7 +7,7 @@ import '@mantine/core/styles.css';
 import { useEffect } from 'react';
 import Aos from 'aos';
 import 'aos/dist/aos.css';
-import GsapProvider from '../components/gsap-provider';
+import { Analytics } from "@vercel/analytics/react"
 
 export default function FTCLawyer({ Component, pageProps }) {
     useEffect(() => {
@@ -20,9 +20,12 @@ export default function FTCLawyer({ Component, pageProps }) {
 
     return (
         <MantineProvider withGlobalStyles withNormalizeCSS defaultColorScheme='dark' theme={createTheme({ breakpoints: { xl: '140em' } })}>
-            <GsapProvider>
-                {getLayout(<Component {...pageProps} />)}
-            </GsapProvider>
+            {getLayout(
+                <>
+                    <Component {...pageProps} />
+                    <Analytics />
+                </>
+            )}
         </MantineProvider>
     );
 }
