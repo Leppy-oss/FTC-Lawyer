@@ -12,8 +12,6 @@ const llm = new ChatGroq({
 	temperature: 0
 });
 
-export const dynamic = 'force-dynamic';
-
 export async function POST(req) {
 	if (req.method == 'POST') {
 		const { query, temperature, chat_history: raw_chat_history = [] } = await req.json();
@@ -39,7 +37,7 @@ export async function POST(req) {
 				['human', '{query}'],
 			]);
 
-			const contextualizedQuestion = input => 'chat_history' in input? contPrompt.pipe(llm).pipe(new StringOutputParser()) : input.query;
+			const contextualizedQuestion = input => 'chat_history' in input ? contPrompt.pipe(llm).pipe(new StringOutputParser()) : input.query;
 
 			const retriever = getRetriever();
 			const prompt = ChatPromptTemplate.fromMessages([
@@ -49,7 +47,7 @@ export async function POST(req) {
 			]);
 
 			const chain = RunnableSequence.from([{
-				context: async input => 'chat_history' in input? contextualizedQuestion(input).pipe(retriever).pipe(formatDocumentsAsString) : '',
+				context: async input => 'chat_history' in input ? contextualizedQuestion(input).pipe(retriever).pipe(formatDocumentsAsString) : '',
 				query: input => input.query,
 				chat_history: input => input.chat_history
 			}, prompt, llm, new StringOutputParser()]);

@@ -11,8 +11,6 @@ const llm = new ChatGroq({
 	temperature: 0
 });
 
-export const dynamic = 'force-dynamic';
-
 export async function POST(req) {
 	if (req.method == 'POST') {
 		const { query, temperature } = await req.json();
