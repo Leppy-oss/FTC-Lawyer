@@ -35,7 +35,6 @@ export default function Chat() {
     const [stream, setStream] = useState(true);
     const [responseTime, setResponseTime] = useState(0);
     const [streamTime, setStreamTime] = useState(0);
-    const [ready, setReady] = useState(false);
     const [recv, setRecv] = useState(false);
     const mounted = useMounted();
 
@@ -89,15 +88,9 @@ export default function Chat() {
         }
     };
 
-    useEffect(() => {
-        fetch('/api/inference/refresh/')
-            .finally(() => setReady(true));
-    }, []);
-
     return (
         <Stack w='100%' mt='md' h='100%'>
             <ScrollArea mah='100%' flex='1' viewportRef={vp}>
-                <LoadingOverlay visible={!ready} overlayProps={{ blur: '4px' }} loaderProps={{ color: 'white', type: 'dots' }} />
                 <Center w='100%' pos='absolute' h='100%' style={{ visibility: chatHistory.length ? 'hidden' : 'visible' }}>
                     <Container p={0} w={mobile ? '90%' : '70%'}>
                         <Image src='/chat-banner.png' alt='' opacity={0.5} lightHidden />
@@ -211,8 +204,8 @@ export default function Chat() {
                                 </ActionIcon>
                             </>
                         }
-                        disabled={submitted || !ready}
-                        buttonDisabled={!query || submitted || !ready}
+                        disabled={submitted}
+                        buttonDisabled={!query || submitted}
                         onChange={e => setQuery(e.target.value)}
                         w={mobile ? '90%' : '70%'}
                         placeholder='Message FTC Lawyer' />
